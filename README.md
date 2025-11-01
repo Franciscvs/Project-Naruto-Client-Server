@@ -1,6 +1,6 @@
 ## Proyecto realizado por Francisco José Puentes Muñoz y Juan Esteban García Díaz para la clase de Arquitectura en Software
 
-## 1. Importar en Visual Studio Code aplicación de Naruto Cliente-Servidor
+## 1. Importar repositorio en Visual Studio Code aplicación de Naruto Cliente-Servidor
 ## 2. Ejecutar en Visual Studio Code
 - => Run Java
 ## 3. Abrir en el navegador
