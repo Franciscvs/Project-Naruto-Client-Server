@@ -28,11 +28,6 @@ http://localhost:8080/
 - `GET /api/v1/reports/ninjas.csv` — Exportar CSV ninjas
 - `GET /api/v1/reports/missions.csv` — Exportar CSV misiones
 
-## Ejecutar en Visual Studio Code
-
-
-# Abrir en el navegador
-http://localhost:8080/
 ```
 > Nota: Se mapea el directorio `./data` para persistir el H2 en el host.
 
@@ -48,3 +43,5 @@ En `src/main/resources/data.sql` se crean tres aldeas por defecto.
 ---
 
 © 2025.
+
+![Diagrama de Clases Image](Diagrama_de_Clases.png)
