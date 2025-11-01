@@ -1,9 +1,12 @@
 ## Proyecto realizado por Francisco José Puentes Muñoz y Juan Esteban García Díaz para la clase de Arquitectura en Software
 
-## 1. Ejecutar en Visual Studio Code
+## 1. Importar en Visual Studio Code aplicación de Naruto Cliente-Servidor
+## 2. Ejecutar en Visual Studio Code
 - => Run Java
-## 2. Abrir en el navegador
+## 3. Abrir en el navegador
 http://localhost:8080/
+## 4. Colocar datos para guardar en la base de datos
+
 ```
 > Nota: Se mapea el directorio `./data` para persistir el H2 en el host.
 
