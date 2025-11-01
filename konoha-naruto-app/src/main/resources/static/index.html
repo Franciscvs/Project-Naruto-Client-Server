@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Konoha - Gestión de Ninjas y Misiones</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    h1 { margin-bottom: 0.5rem; }
+    section { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    label { display:block; margin: 0.25rem 0; }
+    input, select { padding: 0.35rem; }
+    button { padding: 0.5rem 0.8rem; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem; text-align: left; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 1rem; }
+    .ok { color: green; }
+    .err { color: crimson; }
+  </style>
+</head>
+<body>
+  <h1>🏯 Proyecto de Naruto Cliente-Servidor 🏯</h1>
+  <p><strong>Realizado por Francisco José Puentes Muñoz y Juan Esteban García Díaz para la Materia de Arquitectura en Software</strong></p>
+  <p>Endpoints REST listos. Documentación: <a href="/swagger-ui.html" target="_blank">Swagger UI</a> — Base de datos H2: <a href="/h2-console" target="_blank">/h2-console</a> (JDBC URL: <code>jdbc:h2:file:./data/konoha</code>).</p>
+
+  <div class="cols">
+    <section>
+      <h2>➕ Registrar Ninja 🥷</h2>
+      <label>Nombre <input id="n_name"></label>
+      <label>Rango
+        <select id="n_rank">
+          <option>GENIN</option><option>CHUNIN</option><option>JONIN</option>
+        </select>
+      </label>
+      <label>Ataque <input id="n_attack" type="number" value="100"></label>
+      <label>Defensa <input id="n_defense" type="number" value="80"></label>
+      <label>Chakra <input id="n_chakra" type="number" value="120"></label>
+      <label>Aldea
+        <select id="n_village">
+          <option value="1">Konohagakure</option>
+          <option value="2">Sunagakure</option>
+          <option value="3">Kirigakure</option>
+        </select>
+      </label>
+      <label>Jutsus (coma) <input id="n_jutsus" placeholder="Rasengan, Shadow Clone"></label>
+      <button onclick="createNinja()">Crear</button>
+      <div id="ninja_msg"></div>
+      <h3>Lista de Ninjas</h3>
+      <button onclick="loadNinjas()">Refrescar</button>
+      <table id="ninja_tbl"><thead><tr><th>ID</th><th>Nombre</th><th>Rango</th><th>Aldea</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section>
+      <h2>📝 Registrar Misión ⚔️</h2>
+      <label>Nombre <input id="m_name"></label>
+      <label>Rango
+        <select id="m_rank">
+          <option>D</option><option>C</option><option>B</option><option>A</option><option>S</option>
+        </select>
+      </label>
+      <label>Recompensa <input id="m_reward" type="number" value="500"></label>
+      <label>Rango mínimo
+        <select id="m_minRank">
+          <option>D</option><option>C</option><option>B</option><option>A</option><option>S</option>
+        </select>
+      </label>
+      <button onclick="createMission()">Crear</button>
+      <div id="mission_msg"></div>
+      <h3>Lista de Misiones</h3>
+      <button onclick="loadMissions()">Refrescar</button>
+      <table id="mission_tbl"><thead><tr><th>ID</th><th>Nombre</th><th>Rango</th><th>Min</th><th>Recompensa</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section>
+      <h2>🎯 Asignar / Completar 🏆</h2>
+      <label>ID Ninja <input id="a_ninjaId" type="number"></label>
+      <label>ID Misión <input id="a_missionId" type="number"></label>
+      <button onclick="assign()">Asignar misión</button>
+      <label>ID Asignación <input id="a_id" type="number"></label>
+      <button onclick="complete()">Marcar completada</button>
+      <div id="assign_msg"></div>
+
+      <h3>Reportes</h3>
+      <a href="/api/v1/reports/ninjas.csv" target="_blank">Descargar Ninjas.csv</a> |
+      <a href="/api/v1/reports/missions.csv" target="_blank">Descargar Missions.csv</a>
+    </section>
+  </div>
+
+<script>
+async function createNinja(){
+  const body = {
+    name: document.getElementById('n_name').value,
+    rank: document.getElementById('n_rank').value,
+    attack: parseInt(document.getElementById('n_attack').value||0),
+    defense: parseInt(document.getElementById('n_defense').value||0),
+    chakra: parseInt(document.getElementById('n_chakra').value||0),
+    village: { id: parseInt(document.getElementById('n_village').value) },
+    jutsus: document.getElementById('n_jutsus').value
+  };
+  let r = await fetch('/api/v1/ninjas', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  let msg = document.getElementById('ninja_msg');
+  if(r.ok){ msg.innerHTML = '<span class="ok">Ninja creado</span>'; loadNinjas(); }
+  else { let e = await r.json(); msg.innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+
+async function loadNinjas(){
+  let r = await fetch('/api/v1/ninjas');
+  let data = await r.json();
+  let tb = document.querySelector('#ninja_tbl tbody');
+  tb.innerHTML = '';
+  for(const n of data){
+    let tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+n.id+'</td><td>'+n.name+'</td><td>'+n.rank+'</td><td>'+ (n.village?n.village.name:'') +'</td>';
+    tb.appendChild(tr);
+  }
+}
+
+async function createMission(){
+  const body = {
+    name: document.getElementById('m_name').value,
+    rank: document.getElementById('m_rank').value,
+    reward: parseInt(document.getElementById('m_reward').value||0),
+    minRank: document.getElementById('m_minRank').value
+  };
+  let r = await fetch('/api/v1/missions', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  let msg = document.getElementById('mission_msg');
+  if(r.ok){ msg.innerHTML = '<span class="ok">Misión creada</span>'; loadMissions(); }
+  else { let e = await r.json(); msg.innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+
+async function loadMissions(){
+  let r = await fetch('/api/v1/missions');
+  let data = await r.json();
+  let tb = document.querySelector('#mission_tbl tbody');
+  tb.innerHTML = '';
+  for(const m of data){
+    let tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+m.id+'</td><td>'+m.name+'</td><td>'+m.rank+'</td><td>'+m.minRank+'</td><td>'+m.reward+'</td>';
+    tb.appendChild(tr);
+  }
+}
+
+async function assign(){
+  const ninjaId = parseInt(document.getElementById('a_ninjaId').value);
+  const missionId = parseInt(document.getElementById('a_missionId').value);
+  let r = await fetch('/api/v1/assignments/assign?ninjaId='+ninjaId+'&missionId='+missionId, { method:'POST' });
+  let msg = document.getElementById('assign_msg');
+  if(r.ok){ let a=await r.json(); msg.innerHTML = '<span class="ok">Asignación #'+a.id+' creada</span>'; }
+  else { let e = await r.json(); msg.innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+
+async function complete(){
+  const id = parseInt(document.getElementById('a_id').value);
+  let r = await fetch('/api/v1/assignments/'+id+'/complete', { method:'POST' });
+  let msg = document.getElementById('assign_msg');
+  if(r.ok){ let a=await r.json(); msg.innerHTML = '<span class="ok">Asignación #'+a.id+' completada</span>'; }
+  else { let e = await r.json(); msg.innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+</script>
+</body>
+</html>
