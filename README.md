@@ -44,4 +44,8 @@ En `src/main/resources/data.sql` se crean tres aldeas por defecto.
 
 © 2025.
 
+## Diagrama de Clases
 ![Diagrama de Clases Image](Diagrama_de_Clases.png)
+
+## Modelo de Entidad-Relación
+![Modelo de Entidad Relación Image](Modelo_de_Entidad_Relacion.png)
